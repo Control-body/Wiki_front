@@ -50,3 +50,18 @@
     </a-layout-content>
   </a-layout>
 </template>
+<script lang="ts">
+import { defineComponent } from 'vue';
+import axios from 'axios';
+export default defineComponent({
+  name: 'app',
+  setup(){
+    console.log("Vue3新加的setup方法页面一但被初始化就执行这个方法");
+    axios.get("http://localhost:8880/ebook/list?name=Spring").then(
+        (response)=>{
+          console.log(response);
+        }
+    )
+  }
+});
+</script>
