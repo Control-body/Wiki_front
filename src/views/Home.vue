@@ -49,5 +49,4 @@
       Content
     </a-layout-content>
   </a-layout>
-
 </template>
