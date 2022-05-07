@@ -45,23 +45,36 @@
       </a-sub-menu>
     </a-menu>
   </a-layout-sider>
-    <a-layout-content >
-      Content
+    <a-layout-content :style="{background: '#fff' ,padding: '24px',margin: 0,minHeight : '280px'}">
+      <pre>{{ebooks}}{{ebooks2}}</pre>
     </a-layout-content>
   </a-layout>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent ,onMounted,ref,reactive,toRef} from 'vue';
 import axios from 'axios';
 export default defineComponent({
   name: 'app',
   setup(){
     console.log("Vue3新加的setup方法页面一但被初始化就执行这个方法");
-    axios.get("http://localhost:8880/ebook/list?name=Spring").then(
-        (response)=>{
-          console.log(response);
-        }
-    )
+    const ebooks=ref();
+    const ebooks1=reactive({books:[]});
+    //多利用 声明周期这样子的周期函数
+    onMounted(()=>{
+      console.log("onMounted");
+      axios.get("http://localhost:8880/ebook/list?name=Spring").then(
+          (response)=>{
+            const data=response.data;
+            ebooks.value=data.content
+            ebooks1.books=data.content
+            console.log(response);
+          });
+    })
+
+    return{
+      ebooks,
+      ebooks2: toRef(ebooks1,"books")
+    }
   }
 });
 </script>
