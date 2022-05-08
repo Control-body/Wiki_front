@@ -45,7 +45,7 @@
       </a-sub-menu>
     </a-menu>
   </a-layout-sider>
-    <a-layout-content :style="{background: '#fff' ,padding: '24px',margin: 0,minHeight : '280px'}">
+    <a-layout-content :style="{background: '#fff' ,padding: '24px',margin: 0,minHeight : '600px'}">
 
 
       <a-list item-layout="vertical" size="large" :grid="{ gutter: 10, column: 3 }"
