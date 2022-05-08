@@ -99,7 +99,7 @@ export default defineComponent({
     //多利用 声明周期这样子的周期函数
     onMounted(()=>{
       console.log("onMounted");
-      axios.get("http://localhost:8880/ebook/list").then(
+      axios.get(process.env.VUE_APP_SERVER+"/ebook/list").then(
           (response)=>{
             const data=response.data;
             ebooks.value=data.content
