@@ -3,9 +3,30 @@
   <a-layout>
     <a-layout-content :style="{background: '#fff' ,padding: '24px',margin: 0,minHeight : '600px'}">
       <p>
-        <a-button type="primary" @click="add" size="large">
-          新增
-        </a-button>
+        <a-form
+            layout="inline"
+            :model="param"
+        >
+          <a-form-item>
+            <a-input v-model:value="param.name" placeholder="名称">
+              <template #prefix><UserOutlined style="color: rgba(0, 0, 0, 0.25)" /></template>
+            </a-input>
+          </a-form-item>
+
+          <a-form-item>
+            <a-button type="primary" @click="handleQuery({page : 1,size : pagination.pageSize})">
+                查询
+            </a-button>
+          </a-form-item>
+
+          <a-form-item>
+            <a-button type="primary" @click="add">
+              新增
+            </a-button>
+          </a-form-item>
+        </a-form>
+
+
       </p>
       <a-table
           :columns="columns"
@@ -74,8 +95,8 @@ import { message } from 'ant-design-vue';
 export default defineComponent({
   name: 'AdminEbook',
   setup() {
-    // const param = ref();
-    // param.value = {};
+     const param = ref();
+     param.value = {};
     const ebooks = ref();
     // 分页
     const pagination = ref({
@@ -140,7 +161,8 @@ export default defineComponent({
       axios.get("/ebook/list",{
         params : {
           page : params.page,
-          size : params.size
+          size : params.size,
+          name : param.value.name
         }
       }).then((response) => {
         loading.value = false;
@@ -232,6 +254,25 @@ export default defineComponent({
       });
     };
 
+    /**
+     *  查询
+     */
+
+    const searchValue = ref();
+    const onSearch = (searchValue: any) => {
+      axios.post("/ebook/search", searchValue.value).then((response) => {
+        const data = response.data; // data = commonResp
+        if (data.success) {// 判断是否加载成功
+          // 重新加载列表
+          handleQuery({
+            page: pagination.value.current,
+            size: pagination.value.pageSize,
+          });
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
 
     onMounted(() => {
       handleQuery({
@@ -246,15 +287,19 @@ export default defineComponent({
       columns,
       loading,
       handleTableChange,
-
+      handleQuery,
       modalVisible,
       modalLoading,
       handleModalOk,
-      ebook,
-      handleDelete,
 
+      ebook,
+      searchValue,
+
+      handleDelete,
+      param,
       edit,
       add,
+      onSearch
     }
   }
 });
