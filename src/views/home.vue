@@ -83,10 +83,10 @@ export default defineComponent({
     console.log("Vue3新加的setup方法页面一但被初始化就执行这个方法");
     const ebooks=ref();
     const ebooks1=reactive({books:[]});
-    //多利用 声明周期这样子的周期函数
+    //多利用 声明周期这样子的钩子函数
     onMounted(()=>{
       console.log("onMounted");
-      axios.get("/ebook/list").then(
+      axios.get("/ebook/all").then(
           (response)=>{
             const data=response.data;
             ebooks.value=data.content.list
