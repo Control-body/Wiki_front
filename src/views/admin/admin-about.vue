@@ -80,7 +80,7 @@ export default defineComponent({
     // 分页
     const pagination = ref({
       current: 1,
-      pageSize: 1001,
+      pageSize: 2,
       total: 0
     });
 
@@ -100,13 +100,16 @@ export default defineComponent({
         title: '分类一',
         key: 'category1Id',
         dataIndex: 'category1Id',
-        // slots: { customRender: 'category' }
       },
       {
         title: '分类二',
         key: 'category2Id',
         dataIndex: 'category2Id',
-        slots: { customRender: 'category' }
+      },
+      {
+        title: '描述',
+        key: 'description',
+        dataIndex: 'description',
       },
       {
         title: '文档数',
@@ -183,8 +186,8 @@ export default defineComponent({
         modalLoading.value =true;
         const data = response.data; // data = commonResp
         if (data.success) {// 判断是否加载成功
-          modalVisible.value = false;
           modalLoading.value = false;
+          modalVisible.value = false;
           // 重新加载列表
           handleQuery({
             page: pagination.value.current,
