@@ -14,7 +14,7 @@
         </template>
         <template v-slot:action="{ text, record }">
           <a-space size="small">
-            <a-button type="primary">
+            <a-button type="primary" @click="edit">
               编辑
             </a-button>
             <a-button type="danger">
@@ -25,6 +25,14 @@
       </a-table>
     </a-layout-content>
   </a-layout>
+  <a-modal
+      v-model:visible="modalVisible"
+      title="Title"
+      :confirm-loading="modalLoading"
+      @ok="handleModalOk"
+  >
+    <p>test</p>
+  </a-modal>
 </template>
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue';
@@ -156,6 +164,18 @@ export default defineComponent({
         }
       });
     };
+    /**
+     * 编辑
+     */
+    const edit = (record: any) => {
+      modalVisible.value = true;
+      // ebook.value = Tool.copy(record);
+      // categoryIds.value = [ebook.value.category1Id, ebook.value.category2Id]
+    };
+
+
+
+
     onMounted(() => {
       handleQuery({
         page: 1,
@@ -169,6 +189,14 @@ export default defineComponent({
       columns,
       loading,
       handleTableChange,
+
+      modalVisible,
+      modalLoading,
+      handleModalOk,
+
+
+      edit,
+
     }
   }
 });
