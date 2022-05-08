@@ -77,19 +77,6 @@ import { defineComponent ,onMounted,ref,reactive,toRef} from 'vue';
 import axios from 'axios';
 
 const listData: any = [];
-
-for (let i = 0; i < 23; i++) {
-  listData.push({
-    href: 'https://www.antdv.com/',
-    title: `ant design vue part ${i}`,
-    avatar: 'https://joeschmoe.io/api/v1/random',
-    description:
-        'Ant Design, a design language for background applications, is refined by Ant UED Team.',
-    content:
-        'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
-  });
-}
-
 export default defineComponent({
   name: 'app',
   setup(){
@@ -99,7 +86,7 @@ export default defineComponent({
     //多利用 声明周期这样子的周期函数
     onMounted(()=>{
       console.log("onMounted");
-      axios.get(process.env.VUE_APP_SERVER+"/ebook/list").then(
+      axios.get("/ebook/list").then(
           (response)=>{
             const data=response.data;
             ebooks.value=data.content
