@@ -26,7 +26,7 @@
           </a-form-item>
         </a-form>
 
-
+<!-- 数据展示区域 -->
       </p>
       <a-table
           :columns="columns"
@@ -38,6 +38,8 @@
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar" />
         </template>
+
+
         <template v-slot:action="{ text, record }">
           <a-space size="small">
             <a-button type="primary" @click="edit(record)">
@@ -55,9 +57,12 @@
             </a-popconfirm>
           </a-space>
         </template>
+
+
       </a-table>
     </a-layout-content>
   </a-layout>
+<!--  跳出的 编辑框 -->
   <a-modal
       v-model:visible="modalVisible"
       title="Title"
@@ -241,7 +246,7 @@ export default defineComponent({
      * 删除
      */
     const handleDelete = (id : number ) => {
-      axios.delete("/ebook/delete"+id).then((response) => {
+      axios.delete("/ebook/delete/"+id).then((response) => {
         const data = response.data; // data = commonResp
         if (data.success) {// 判断是否加载成功
           // 重新加载列表
