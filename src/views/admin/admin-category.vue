@@ -7,16 +7,8 @@
             layout="inline"
             :model="param"
         >
-          <a-form-item>
-            <a-input v-model:value="param.name" placeholder="名称">
-              <template #prefix><UserOutlined style="color: rgba(0, 0, 0, 0.25)" /></template>
-            </a-input>
-          </a-form-item>
 
           <a-form-item>
-            <a-button type="primary" @click="handleQuery({page : 1,size : pagination.pageSize})">
-                查询
-            </a-button>
           </a-form-item>
 
           <a-form-item>
@@ -32,7 +24,7 @@
           :columns="columns"
           :row-key="record => record.id"
           :data-source="categorys"
-          :pagination="pagination"
+          :pagination="false"
           :loading="Loading"
           @change="handleTableChange">
         <template #cover="{ text: cover }">
@@ -90,13 +82,6 @@ export default defineComponent({
      const param = ref();
      param.value = {};
     const categorys = ref();
-    // 分页
-    const pagination = ref({
-      current: 1,
-      pageSize: 10,
-      total: 0
-    });
-
     const loading = ref(false);
 
     const columns = [
@@ -125,44 +110,20 @@ export default defineComponent({
     /**
      * 数据查询
      **/
-    const handleQuery = (params: any) => {
+    const handleQuery = () => {
       loading.value = true;
       // 如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
       // categorys.value = [];
-      axios.get("/category/list",{
-        params : {
-          page : params.page,
-          size : params.size,
-          name : param.value.name
-        }
-      }).then((response) => {
+      axios.get("/category/all").then((response) => {
         loading.value = false;
         const data = response.data;
         if (data.success) {
-          categorys.value = data.content.list;
-          // 重置分页按钮
-          pagination.value.current = params.page;
-          pagination.value.total = data.content.total;
+          categorys.value = data.content;
         } else {
           message.error(data.message);
         }
-        categorys.value=data.content.list;
-        pagination.value.current = params.page;
-        pagination.value.total = data.content.total;
       });
     };
-
-    /**
-     * 表格点击页码时触发
-     */
-    const handleTableChange = (pagination: any) => {
-      console.log("看看自带的分页参数都有啥：" + pagination);
-      handleQuery({
-        page: pagination.current,
-        size: pagination.pageSize
-      });
-    };
-
     // -------- 表单 ---------
     /**
      * 数组，[100, 101]对应：前端开发 / Vue
@@ -182,10 +143,7 @@ export default defineComponent({
           modalLoading.value = false;
           modalVisible.value = false;
           // 重新加载列表
-          handleQuery({
-            page: pagination.value.current,
-            size: pagination.value.pageSize,
-          });
+          handleQuery();
         } else {
           message.error(data.message);
         }
@@ -215,10 +173,7 @@ export default defineComponent({
         const data = response.data; // data = commonResp
         if (data.success) {// 判断是否加载成功
           // 重新加载列表
-          handleQuery({
-            page: pagination.value.current,
-            size: pagination.value.pageSize,
-          });
+          handleQuery();
         } else {
           message.error(data.message);
         }
@@ -235,10 +190,7 @@ export default defineComponent({
         const data = response.data; // data = commonResp
         if (data.success) {// 判断是否加载成功
           // 重新加载列表
-          handleQuery({
-            page: pagination.value.current,
-            size: pagination.value.pageSize,
-          });
+          handleQuery();
         } else {
           message.error(data.message);
         }
@@ -246,18 +198,13 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      handleQuery({
-        page: 1,
-        size: pagination.value.pageSize
-      });
+      handleQuery();
     });
 
     return {
       categorys,
-      pagination,
       columns,
       loading,
-      handleTableChange,
       handleQuery,
       modalVisible,
       modalLoading,
