@@ -23,7 +23,7 @@
       <a-table
           :columns="columns"
           :row-key="record => record.id"
-          :data-source="categorys"
+          :data-source="level1"
           :pagination="false"
           :loading="Loading"
           @change="handleTableChange">
@@ -62,6 +62,18 @@
       </a-form-item>
       <a-form-item label="父分类">
       <a-input v-model:value="category.parent" />
+
+          <a-select
+              ref="select"
+              v-model:value="category.parent"
+          >
+            <a-select-option value="0">无</a-select-option>
+            <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disable="category.id === c.id">
+              {{c.name}}
+            </a-select-option>
+
+          </a-select>
+
     </a-form-item>
       <a-form-item label="排序">
         <a-input v-model:value="category.sort" />
@@ -106,7 +118,7 @@ export default defineComponent({
      }
 
     ];
-
+    const level1=ref(); // 一级分类树 children 就是二级分类
     /**
      * 数据查询
      **/
@@ -119,6 +131,10 @@ export default defineComponent({
         const data = response.data;
         if (data.success) {
           categorys.value = data.content;
+          console.log("原始数据",categorys.value);
+          level1.value=[];
+          level1.value=Tool.array2Tree(categorys.value,0);
+          console.log("树状数据",level1.value);
         } else {
           message.error(data.message);
         }
@@ -139,8 +155,8 @@ export default defineComponent({
       axios.post("/category/save", category.value).then((response) => {
         modalLoading.value =true;
         const data = response.data; // data = commonResp
+        modalLoading.value = false;
         if (data.success) {// 判断是否加载成功
-          modalLoading.value = false;
           modalVisible.value = false;
           // 重新加载列表
           handleQuery();
@@ -202,7 +218,7 @@ export default defineComponent({
     });
 
     return {
-      categorys,
+      //categorys,
       columns,
       loading,
       handleQuery,
@@ -210,6 +226,7 @@ export default defineComponent({
       modalLoading,
       handleModalOk,
 
+      level1,
       category,
       searchValue,
 
