@@ -38,6 +38,10 @@
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar" />
         </template>
+<!--        渲染数据-->
+        <template v-slot:category="{ text , record }">
+          <span>{{getCategoryName(record.category1Id)}}/{{getCategoryName(record.category2Id)}}</span>
+        </template>
         <template v-slot:action="{ text, record }">
           <a-space size="small">
             <a-button type="primary" @click="edit(record)">
@@ -124,15 +128,10 @@ export default defineComponent({
         dataIndex: 'name'
       },
       {
-        title: '分类一',
-        key: 'category1Id',
-        dataIndex: 'category1Id',
+        title: '分类',
+        slots: { customRender: 'category' }
       },
-      {
-        title: '分类二',
-        key: 'category2Id',
-        dataIndex: 'category2Id',
-      },
+
       {
         title: '描述',
         key: 'description',
@@ -200,6 +199,7 @@ export default defineComponent({
     /**
      * 查询所有分类
      */
+    let categorys : any;
     const level1=ref();
     const handleQueryCategory = () => {
       loading.value = true;
@@ -209,7 +209,7 @@ export default defineComponent({
         loading.value = false;
         const data = response.data;
         if (data.success) {
-          const categorys = data.content;
+          categorys = data.content;
           console.log("原始数据",categorys);
           level1.value=[];
           level1.value=Tool.array2Tree(categorys,0);
@@ -219,6 +219,19 @@ export default defineComponent({
         }
       });
     };
+    // 用类型id 找出类型名称
+    const getCategoryName=(cid : number) =>{
+      let result="";
+      categorys.forEach(( item: any)=>{
+        if(item.id===cid){
+          result=item.name;
+        }
+      });
+      return result;
+    };
+
+
+
     // -------- 表单 ---------
     /**
      * 数组，[100, 101]对应：前端开发 / Vue
@@ -233,10 +246,10 @@ export default defineComponent({
       ebook.value.category2Id = categoryIds.value[1];
       axios.post("/ebook/save", ebook.value).then((response) => {
         modalLoading.value =true;
+        modalLoading.value = false;
         const data = response.data; // data = commonResp
         if (data.success) {// 判断是否加载成功
-          modalLoading.value = false;
-          modalVisible.value = false;
+          modalVisible.value = false; // 让编辑窗口关闭
           // 重新加载列表
           handleQuery({
             page: pagination.value.current,
@@ -326,6 +339,7 @@ export default defineComponent({
       ebook,
       searchValue,
 
+      getCategoryName,
       handleDelete,
       param,
       edit,
