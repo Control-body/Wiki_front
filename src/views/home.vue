@@ -12,7 +12,6 @@
           <span>欢迎</span>
 <!--        </router-link>-->
       </a-menu-item>
-
 <!--      循环读取 菜单中的值 -->
       <a-sub-menu v-for="item in level1" :key="item.id">
 <!--        一级菜单-->
@@ -31,9 +30,6 @@
     </a-menu
        >
     </a-layout-sider>
-
-
-
 
     <a-layout-content :style="{background: '#fff' ,padding: '24px',margin: 0,minHeight : '600px'}">
       <div class="welcome" v-show="isShowWelcome">
@@ -64,10 +60,6 @@
     </a-layout-content>
   </a-layout>
 </template>
-
-
-
-
 <script lang="ts">
 import { defineComponent ,onMounted,ref,reactive,toRef} from 'vue';
 import axios from 'axios';
@@ -78,22 +70,9 @@ const listData: any = [];
 export default defineComponent({
   name: 'app',
   setup(){
-
-
     console.log("Vue3新加的setup方法页面一但被初始化就执行这个方法");
     const ebooks=ref();
     const ebooks1=reactive({books:[]});
-    //多利用 声明周期这样子的钩子函数
-    onMounted(()=>{
-      console.log("onMounted");
-      axios.get("/ebook/all").then(
-          (response)=>{
-            const data=response.data;
-            ebooks.value=data.content.list
-            console.log(response);
-          });
-    });
-
     /**
      * 查询所有分类
      */
@@ -118,20 +97,37 @@ export default defineComponent({
       });
     };
     const isShowWelcome=ref(true);  // js 中必须先定义在 使用
-
-    const handleClick=(value : any) =>{
+    let categoryId2 =0;  //按照分类查询 电子书
+    const handleQueryEbook=()=>{
+      axios.get("/ebook/list",{
+        params:{
+          page:1,
+          size:1000,
+          categoryId2: categoryId2
+        }
+      }).then(
+          (response)=>{
+            const data=response.data;
+            ebooks.value=data.content.list
+            console.log(response);
+          });
+    }
+    const handleClick=(value : any) =>{   //点击菜单的时候 执行的方法 设置false 和 重新查询
       console.log("menu click" ,value);
       //isShowWelcome.value = value.key === 'welcome';    下面可以重构成这样子
       if(value.key==='welcome'){
         isShowWelcome.value=true; // 当值是welcome 的时候就显示欢迎页
       }else{
+        categoryId2=value.key;
         isShowWelcome.value=false;// 当值不是welcome的时候 就显示电子书
+        handleQueryEbook();//点击的时候在调用这个方法
       }
     }
-
-    // 钩子函数
-    onMounted(() => {
+    //多利用 声明周期这样子的钩子函数
+    onMounted(()=>{
       handleQueryCategory();// 在页面的一开始就取加载所有的分类
+      handleQueryEbook();//调用查询所有方法
+      console.log("onMounted");
     });
     // 返回值 可以给外面使用的
     return{
