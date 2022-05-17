@@ -89,8 +89,6 @@ export default defineComponent({
           level1.value=[];
           level1.value=Tool.array2Tree(categorys,0);
           console.log("树状数据",level1);
-
-
         } else {
           message.error(data.message);
         }

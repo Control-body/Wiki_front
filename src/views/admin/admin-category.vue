@@ -59,7 +59,6 @@
       </a-form-item>
       <a-form-item label="父分类">
       <a-input v-model:value="category.parent" />
-
           <a-select
               ref="select"
               v-model:value="category.parent"
@@ -68,9 +67,7 @@
             <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disable="category.id === c.id">
               {{c.name}}
             </a-select-option>
-
           </a-select>
-
     </a-form-item>
       <a-form-item label="排序">
         <a-input v-model:value="category.sort" />

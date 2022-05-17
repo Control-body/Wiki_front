@@ -103,9 +103,7 @@
         <a-input v-model:value="ebook.description" type="text" />
       </a-form-item>
 
-
     </a-form>
-
   </a-modal>
 </template>
 <script lang="ts">
@@ -124,12 +122,10 @@ export default defineComponent({
     // 分页
     const pagination = ref({
       current: 1,
-      pageSize: 2,
+      pageSize: 5,
       total: 0
     });
-
     const loading = ref(false);
-
     const columns = [
       {
         title: '封面',

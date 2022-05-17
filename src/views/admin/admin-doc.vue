@@ -54,9 +54,26 @@
       <a-form-item label="名称">
         <a-input v-model:value="doc.name" />
       </a-form-item>
-      <a-form-item label="父文档">
-      <a-input v-model:value="doc.parent" />
 
+      <a-form-item label="父文档">
+        <a-tree-select
+            v-model:value="(doc.parent)"
+            show-search
+            style="width: 100%"
+            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+            placeholder="请选择父标签"
+            allow-clear
+            tree-default-expand-all
+            :tree-data="treeSelectData"
+            :replaceFields="
+              {children:'children', label:'name', key:'id', value: 'id' }
+            "
+        >
+          <!-- 具有树型数据的 就是level1  level1 不能增加 无 否则表格里面也会 出现无 -->
+        </a-tree-select>
+      </a-form-item>
+
+      <a-form-item label="父文档">
           <a-select
               ref="select"
               v-model:value="doc.parent"
@@ -65,7 +82,6 @@
             <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disable="doc.id === c.id">
               {{c.name}}
             </a-select-option>
-
           </a-select>
 
     </a-form-item>
@@ -113,13 +129,34 @@ export default defineComponent({
 
     ];
     const level1=ref(); // 一级文档树 children 就是二级文档
+    const setDisable=(treeSelectData : any,id : any)=>{
+      for (let i=0;i<treeSelectData.length;i++){
+        const node = treeSelectData[i];
+        if(node.id=id){
+          console.log("disable",node);
+          node.disabled=true; // 设置为不可见
+          const children = node.children;
+          if(Tool.isNotEmpty(children)){
+            for (let j=0;j<children.length;j++){
+              setDisable(children,children[j].id);  //递归调用
+            }
+          }
+        }else{
+          // 如果当前节点不是 目标节点 就到字节点 去找
+          const children = node.children;
+          if (Tool.isNotEmpty(children)){
+            setDisable(children,id);
+          }
+        }
+      }
+    }
     /**
      * 数据查询
      **/
     const handleQuery = () => {
       loading.value = true;
       // 如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
-      docs.value = [];
+      level1.value = [];
       axios.get("/doc/all").then((response) => {
         loading.value = false;
         const data = response.data;
@@ -138,6 +175,8 @@ export default defineComponent({
     /**
      * 数组，[100, 101]对应：前端开发 / Vue
      */
+    const treeSelectData=ref(); // 初始是一个空的json数组
+    treeSelectData.value=[];
     const docIds = ref();
     const doc = ref();
     const modalVisible = ref(false);
@@ -166,6 +205,9 @@ export default defineComponent({
       modalVisible.value = true;
       doc.value = Tool.copy(record);
       // docIds.value = [doc.value.doc1Id, doc.value.doc2Id]
+      treeSelectData.value=Tool.copy(level1.value);
+      setDisable(treeSelectData.value,record.id); //设置他的子节点 和他的子孙节点都失效
+      treeSelectData.value.unshift({id:0 ,name:'无'}); //unshift是在前方添加一个元素
     };
     /**
      * 新增
@@ -173,7 +215,8 @@ export default defineComponent({
     const add = () => {
       modalVisible.value = true;
       doc.value = {};
-
+      treeSelectData.value=Tool.copy(level1.value);
+      treeSelectData.value.unshift({id:0 ,name:'无'}); //unshift是在前方添加一个元素
     };
     /**
      * 删除
@@ -228,7 +271,9 @@ export default defineComponent({
       param,
       edit,
       add,
-      onSearch
+      onSearch,
+      //返回出去 数值
+      treeSelectData
     }
   }
 });
