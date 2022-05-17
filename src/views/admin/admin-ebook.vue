@@ -78,6 +78,7 @@
       <a-form-item label="名称">
         <a-input v-model:value="ebook.name" />
       </a-form-item>
+      <!--        定义响应式 变量categoryIds   -->
       <a-form-item label="分类">
         <a-input v-model:value="categoryIds" />
         <a-cascader
@@ -86,12 +87,14 @@
             :options="level1"
             placeholder="Please select" />
       </a-form-item>
+
+
       <a-form-item label="描述">
         <a-input v-model:value="ebook.description" type="text" />
       </a-form-item>
+
+
     </a-form>
-
-
 
   </a-modal>
 </template>
@@ -212,8 +215,13 @@ export default defineComponent({
           categorys = data.content;
           console.log("原始数据",categorys);
           level1.value=[];
-          level1.value=Tool.array2Tree(categorys,0);
+          level1.value=Tool.array2Tree(categorys,0); // 转换成树型结构
           console.log("树状数据",level1);
+// 加载完成分类后 在加载电子书 否则如果分类树 加载很慢 电子书渲染就会出错
+          handleQuery({
+            page: 1,
+            size: pagination.value.pageSize
+          });
         } else {
           message.error(data.message);
         }
@@ -230,11 +238,10 @@ export default defineComponent({
       return result;
     };
 
-
-
     // -------- 表单 ---------
     /**
      * 数组，[100, 101]对应：前端开发 / Vue
+     * categoryIds 定义响应形式变量
      */
     const categoryIds = ref();
     const ebook = ref();
@@ -242,8 +249,10 @@ export default defineComponent({
     const modalLoading = ref(false);
     const handleModalOk = () => {
       modalLoading.value = true;
+      //取到两个值
       ebook.value.category1Id = categoryIds.value[0];
       ebook.value.category2Id = categoryIds.value[1];
+      //在保存到数据库
       axios.post("/ebook/save", ebook.value).then((response) => {
         modalLoading.value =true;
         modalLoading.value = false;
@@ -262,6 +271,7 @@ export default defineComponent({
     };
     /**
      * 编辑
+     * 就是显示出来 赋值给响应式变量
      */
     const edit = (record : any) => {
       modalVisible.value = true;
@@ -315,10 +325,6 @@ export default defineComponent({
 
     onMounted(() => {
       handleQueryCategory();
-      handleQuery({
-        page: 1,
-        size: pagination.value.pageSize
-      });
     });
 
     return {
@@ -333,12 +339,13 @@ export default defineComponent({
       handleModalOk,
 
       categoryIds,
+      //表单分类去查询数据库
       level1,
 
 
       ebook,
       searchValue,
-
+//  得到类型 对应的名称
       getCategoryName,
       handleDelete,
       param,
