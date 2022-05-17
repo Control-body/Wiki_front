@@ -44,9 +44,17 @@
         </template>
         <template v-slot:action="{ text, record }">
           <a-space size="small">
+            <router-link to="/admin/doc">
+              <a-button type="primary" >
+                文档管理
+              </a-button>
+            </router-link>
+
+
             <a-button type="primary" @click="edit(record)">
               编辑
             </a-button>
+
             <a-popconfirm
                 title="删除后不可赋值 确认删除?"
                 ok-text="是"
@@ -57,6 +65,8 @@
                 删除
               </a-button>
             </a-popconfirm>
+
+
           </a-space>
         </template>
 
