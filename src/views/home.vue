@@ -1,17 +1,16 @@
 <template>
   <a-layout>
     <a-layout-sider width="200" style="background: #fff">
-    <a-menu
-        v-model:selectedKeys="selectedKeys2"
-        v-model:openKeys="openKeys"
+       <a-menu
+           @click="handleClick"
         mode="inline"
         :style="{ height: '100%', borderRight: 0 }"
-    >
+        >
       <a-menu-item key="welcome">
-        <router-link to="/">
+<!--        <router-link to="/"> 页面全部在 本页 就不需跳转 了 -->
           <MailOutlined/>
           <span>欢迎</span>
-        </router-link>
+<!--        </router-link>-->
       </a-menu-item>
 
 <!--      循环读取 菜单中的值 -->
@@ -29,16 +28,19 @@
         </a-menu-item>
 
       </a-sub-menu>
+    </a-menu
+       >
+    </a-layout-sider>
 
 
 
 
-    </a-menu>
-  </a-layout-sider>
     <a-layout-content :style="{background: '#fff' ,padding: '24px',margin: 0,minHeight : '600px'}">
-
-
-      <a-list item-layout="vertical" size="large" :grid="{ gutter: 10, column: 3 }"
+      <div class="welcome" v-show="isShowWelcome">
+        <h1>欢迎使用Control电子书网站</h1>
+      </div>
+<!--       显示图书部分 -->
+      <a-list v-show="!isShowWelcome" item-layout="vertical" size="large" :grid="{ gutter: 10, column: 3 }"
               :data-source="ebooks">
         <template #renderItem="{ item }">
           <a-list-item key="item.name">
@@ -57,9 +59,15 @@
           </a-list-item>
         </template>
       </a-list>
+
+
     </a-layout-content>
   </a-layout>
 </template>
+
+
+
+
 <script lang="ts">
 import { defineComponent ,onMounted,ref,reactive,toRef} from 'vue';
 import axios from 'axios';
@@ -109,18 +117,26 @@ export default defineComponent({
         }
       });
     };
-    const handleClick=() =>{
-      console.log("menu click");
-    }
+    const isShowWelcome=ref(true);  // js 中必须先定义在 使用
 
+    const handleClick=(value : any) =>{
+      console.log("menu click" ,value);
+      //isShowWelcome.value = value.key === 'welcome';    下面可以重构成这样子
+      if(value.key==='welcome'){
+        isShowWelcome.value=true; // 当值是welcome 的时候就显示欢迎页
+      }else{
+        isShowWelcome.value=false;// 当值不是welcome的时候 就显示电子书
+      }
+    }
 
     // 钩子函数
     onMounted(() => {
       handleQueryCategory();// 在页面的一开始就取加载所有的分类
     });
-
     // 返回值 可以给外面使用的
     return{
+      // 是否显示欢迎页
+      isShowWelcome,
       ebooks,
       ebooks2: toRef(ebooks1,"books"),
       listData,
@@ -138,8 +154,6 @@ export default defineComponent({
       handleClick,
       level1
     }
-
-
 
   }
 });
