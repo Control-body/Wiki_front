@@ -7,16 +7,15 @@
             layout="inline"
             :model="param"
         >
-
           <a-form-item>
             <a-button type="primary" @click="add">
               新增
             </a-button>
           </a-form-item>
         </a-form>
-
-
       </p>
+
+      
       <a-table
           :columns="columns"
           :row-key="record => record.id"
