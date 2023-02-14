@@ -49,8 +49,6 @@
                 文档管理
               </a-button>
             </router-link>
-
-
             <a-button type="primary" @click="edit(record)">
               编辑
             </a-button>
@@ -65,12 +63,8 @@
                 删除
               </a-button>
             </a-popconfirm>
-
-
           </a-space>
         </template>
-
-
       </a-table>
     </a-layout-content>
   </a-layout>

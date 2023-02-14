@@ -1,11 +1,10 @@
 <template>
-
   <a-layout>
     <a-layout-content :style="{background: '#fff' ,padding: '24px',margin: 0,minHeight : '600px'}">
       <a-row :gutter="24">
         <a-col :span="8">
           <p>
-            <!--        新增按钮 -->
+            <!--新增按钮 -->
             <a-form
                 layout="inline"
                 :model="param"
@@ -88,24 +87,12 @@
                 <!-- 具有树型数据的 就是level1  level1 不能增加 无 否则表格里面也会 出现无 -->
               </a-tree-select>
             </a-form-item>
-<!--            <a-form-item >-->
-<!--              <a-select-->
-<!--                  ref="select"-->
-<!--                  v-model:value="doc.parent"-->
-<!--              >-->
-<!--                <a-select-option value="0">无</a-select-option>-->
-<!--                <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disable="doc.id === c.id">-->
-<!--                  {{c.name}}-->
-<!--                </a-select-option>-->
-<!--              </a-select>-->
-<!--            </a-form-item>-->
+
             <a-form-item>
               <a-input v-model:value="doc.sort" placeholder="顺序"/>
             </a-form-item>
-
-            <a-form-item >
-              <div id="toolbar-container"></div>
-              <div id="editor-container"></div>
+            <a-form-item label="内容">
+              <div id="content"></div>
             </a-form-item>
           </a-form>
         </a-col>
@@ -121,11 +108,13 @@ import {Tool} from "../../util/tool";
 import {useRoute} from "vue-router";
 import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
 import '@wangeditor/editor/dist/css/style.css'
-import { createEditor, createToolbar,IToolbarConfig, IEditorConfig, IDomEditor } from '@wangeditor/editor'
+import E from "wangeditor"
+
 export default defineComponent({
   name: 'AdminDoc',
   setup() {
     const  route=useRoute();  // 得到路由的各种信息
+    console.log("路由的信息是,为了获取 ebookID ")
     console.log(route)
     const param = ref();
     param.value = {};
@@ -153,6 +142,8 @@ export default defineComponent({
      */
     const deleteIds: Array<string> = [];
     const deleteNames: Array<string> = [];
+    const editor = new E("#content")
+    editor.config.zIndex=0;
     //要删除那些ID 递归查询出所有的ID 放入ids
     const getDeleteIds=(treeSelectData : any,id : any)=>{
       console.log("得到要删除的ID"+id);
@@ -164,6 +155,7 @@ export default defineComponent({
           deleteIds.push(id);
           deleteNames.push(node.name)
           const children = node.children;
+          //看他是否 有子类分类
           if(Tool.isNotEmpty(children)){
             for (let j=0;j<children.length;j++){
               getDeleteIds(children,children[j].id);  //递归调用
@@ -238,24 +230,11 @@ export default defineComponent({
     const modalVisible = ref(false);
     const modalLoading = ref(false);
 
-
-    // 导入富文档
-    // 编辑器配置
-    const editorConfig: Partial<IEditorConfig> = {}
-    editorConfig.placeholder = '请输入内容'
-    editorConfig.onChange = (editor: IDomEditor) => {
-      // 当编辑器选区、内容变化时，即触发
-      console.log('content', editor.children)
-      console.log('html', editor.getHtml())
-    }
-// 导入 富文档
-// 工具栏配置
-    const toolbarConfig: Partial<IToolbarConfig> = {}
-
     /**
      * 添加完成的 方法调用
      */
     const handleSave = () => {
+      // doc.value.content=MyEditor.setup().valueHtml;
       modalLoading.value = false;
       axios.post("/doc/save", doc.value).then((response) => {
         //modalLoading.value =true;
@@ -340,21 +319,7 @@ export default defineComponent({
     };
     onMounted(() => {
       handleQuery();
-
-      // 创建编辑器
-      const  editor=createEditor({
-        selector: '#editor-container',
-        config: editorConfig,
-        mode: 'default' // 或 'simple' 参考下文
-      })
-      // 创建工具栏
-      const toolbar = createToolbar({
-        editor,
-        selector: '#toolbar-container',
-        config: toolbarConfig,
-        mode: 'default' // 或 'simple' 参考下文
-      })
-
+      editor.create();
     });
 
     return {
