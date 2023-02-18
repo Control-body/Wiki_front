@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/home.vue'
 import About from '../views/about.vue'
+import AdminUser from "@/views/admin/admin-user.vue";
 import AdminEbook from '../views/admin/admin-ebook.vue'
 import Category from '../views/admin/admin-category.vue'
 import AdminDoc from '../views/admin/admin-doc.vue'
@@ -19,6 +20,12 @@ const routes: Array<RouteRecordRaw> = [
     // // which is lazy-loaded when the route is visited. 先下面是懒加载的方式
     // component: () => import(/* webpackChunkName: "about" */ '../views/admin-ebook.vue')
   },
+  {
+    path: '/admin/user',
+    name: 'AdminUser',
+    component: AdminUser
+  },
+
   {
     path: '/admin/ebook',
     name: 'AdminEbook',
