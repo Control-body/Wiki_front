@@ -65,13 +65,13 @@
       @ok="handleModalOk"
   >
     <a-form :model="user" :label-col="{span: 6}">
-      <a-form-item label="登录名">
-        <a-input v-model:value="user.loginName" />
+      <a-form-item label="登录名" >
+        <a-input v-model:value="user.loginName" :disabled="user.id"/>
       </a-form-item>
       <a-form-item label="名称">
         <a-input v-model:value="user.name" />
       </a-form-item>
-      <a-form-item label="密码">
+      <a-form-item label="密码" v-show="!user.id">
         <a-input v-model:value="user.password" type="text" />
       </a-form-item>
     </a-form>
@@ -82,6 +82,9 @@ import { defineComponent, onMounted, ref } from 'vue';
 import axios from 'axios';
 import { message } from 'ant-design-vue';
 import {Tool} from "../../util/tool";
+
+declare let hexMd5: any;
+declare let KEY:any;
 export default defineComponent({
   name: 'Doc',
   setup() {
@@ -170,10 +173,13 @@ export default defineComponent({
     const modalLoading = ref(false);
     const handleModalOk = () => {
       modalLoading.value = true;
+      //对密码进行加密
+      user.value.password=hexMd5(user.value.password+KEY)
       //在保存到数据库
       axios.post("/user/save", user.value).then((response) => {
         modalLoading.value =true;
         modalLoading.value = false;
+
         const data = response.data; // data = commonResp
         if (data.success) {// 判断是否加载成功
           modalVisible.value = false; // 让编辑窗口关闭
