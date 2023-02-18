@@ -146,9 +146,6 @@ export default defineComponent({
         } else {
           message.error(data.message);
         }
-        // users.value=data.content.list;
-        // pagination.value.current = params.page;
-        // pagination.value.total = data.content.total;
       });
     };
 
@@ -179,7 +176,6 @@ export default defineComponent({
       axios.post("/user/save", user.value).then((response) => {
         modalLoading.value =true;
         modalLoading.value = false;
-
         const data = response.data; // data = commonResp
         if (data.success) {// 判断是否加载成功
           modalVisible.value = false; // 让编辑窗口关闭
@@ -244,9 +240,6 @@ export default defineComponent({
         }
       });
     };
-    // onMounted(() => {
-    //
-    // });
     return {
       users,
       pagination,
